@@ -6,13 +6,14 @@ import StartButton from './StartButton'
 import { StyledTetris, StyledTetrisWrapper } from './styles/StyledTetris'
 import { usePlayer, useStage } from '../hooks'
 import { createStage } from '../helpers/create-stage'
+import { detectCollision } from '../helpers/collision-detection'
 
 const Tetris = () => {
   const [dropTime, setDropTime] = useState(null)
   const [gameOver, setGameOver] = useState(false)
 
   const [player, updatePlayerPos, resetPlayer] = usePlayer()
-  const [stage, setStage] = useStage(player)
+  const [stage, setStage] = useStage(player, resetPlayer)
 
   console.log('re-render')
 
@@ -20,21 +21,41 @@ const Tetris = () => {
     // reset everything
     setStage(createStage())
     resetPlayer()
+    setGameOver(false)
   }
 
+  // Moving tetromino horizontally
   const movePlayer = (dir) => {
-    updatePlayerPos({
-      x: dir,
-      y: 0,
-    })
+    if (!detectCollision(player, stage, { x: dir, y: 0 })) {
+      updatePlayerPos({
+        x: dir,
+        y: 0,
+      })
+    }
   }
 
+  // Moving tetromino perpendicularly
   const drop = () => {
-    updatePlayerPos({
-      x: 0,
-      y: 1,
-      collided: false,
-    })
+    if (!detectCollision(player, stage, { x: 0, y: 1 })) {
+      updatePlayerPos({
+        x: 0,
+        y: 1,
+        collided: false,
+      })
+    } else {
+      // Game over
+      if (player.pos.y < 1) {
+        alert('GAME OVER!')
+        setGameOver(true)
+        setDropTime(null)
+      }
+
+      updatePlayerPos({
+        x: 0,
+        y: 0,
+        collided: true,
+      })
+    }
   }
 
   const dropPlayer = () => {
