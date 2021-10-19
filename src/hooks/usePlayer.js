@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { randomTetromino } from '../helpers/tetrominos'
-import { STAGE_W } from '../helpers/game-helper'
+import { STAGE_W } from '../constants'
 import { Tetrominos } from '../helpers/tetrominos'
 
 export const usePlayer = () => {

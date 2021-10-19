@@ -5,7 +5,7 @@ import Display from './Display'
 import StartButton from './StartButton'
 import { StyledTetris, StyledTetrisWrapper } from './styles/StyledTetris'
 import { usePlayer, useStage } from '../hooks'
-import { createStage } from '../helpers/game-helper'
+import { createStage } from '../helpers/create-stage'
 
 const Tetris = () => {
   const [dropTime, setDropTime] = useState(null)
