@@ -15,7 +15,7 @@ const Tetris = () => {
   const [player, updatePlayerPos, resetPlayer, playerRotate] = usePlayer()
   const [stage, setStage] = useStage(player, resetPlayer)
 
-  console.log('re-render')
+  // console.log('re-render')
 
   const startGame = () => {
     // reset everything
