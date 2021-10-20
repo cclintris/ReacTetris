@@ -4,24 +4,29 @@ import Stage from './Stage'
 import Display from './Display'
 import StartButton from './StartButton'
 import { StyledTetris, StyledTetrisWrapper } from './styles/StyledTetris'
-import { usePlayer, useStage } from '../hooks'
+import { usePlayer, useStage, useInterval, useGameStatus } from '../hooks'
 import { createStage } from '../helpers/create-stage'
 import { detectCollision } from '../helpers/collision-detection'
+import { DEFAULT_GAME_SPEED, DEFAULT_GAME_LEAP } from '../constants'
 
 const Tetris = () => {
   const [dropTime, setDropTime] = useState(null)
   const [gameOver, setGameOver] = useState(false)
 
   const [player, updatePlayerPos, resetPlayer, playerRotate] = usePlayer()
-  const [stage, setStage] = useStage(player, resetPlayer)
-
-  // console.log('re-render')
+  const [stage, setStage, rowsCleared] = useStage(player, resetPlayer)
+  const [score, setScore, rows, setRows, level, setLevel] =
+    useGameStatus(rowsCleared)
 
   const startGame = () => {
     // reset everything
     setStage(createStage())
+    setDropTime(DEFAULT_GAME_SPEED)
     resetPlayer()
     setGameOver(false)
+    setScore(0)
+    setRows(0)
+    setLevel(0)
   }
 
   // Moving tetromino horizontally
@@ -36,7 +41,18 @@ const Tetris = () => {
 
   // Moving tetromino perpendicularly
   const drop = () => {
-    if (!detectCollision(player, stage, { x: 0, y: 1 })) {
+    // Increase level
+    if (rows > (level + 1) * 10) {
+      setLevel((prev) => prev + 1)
+      // Increase speed
+      setDropTime(DEFAULT_GAME_SPEED / (level + 1) + DEFAULT_GAME_LEAP)
+    }
+
+    const collided = detectCollision(player, stage, { x: 0, y: 1 })
+
+    console.log('drop collided', collided)
+
+    if (!collided) {
       updatePlayerPos({
         x: 0,
         y: 1,
@@ -58,7 +74,16 @@ const Tetris = () => {
     }
   }
 
+  const restartInterval = ({ keyCode }) => {
+    if (!gameOver) {
+      if (keyCode === 40) {
+        setDropTime(DEFAULT_GAME_SPEED / (level + 1) + DEFAULT_GAME_LEAP)
+      }
+    }
+  }
+
   const dropPlayer = () => {
+    setDropTime(null)
     drop()
   }
 
@@ -84,8 +109,17 @@ const Tetris = () => {
     }
   }
 
+  useInterval(() => {
+    drop()
+  }, dropTime)
+
   return (
-    <StyledTetrisWrapper role="button" tabIndex="0" onKeyDown={(e) => move(e)}>
+    <StyledTetrisWrapper
+      role="button"
+      tabIndex="0"
+      onKeyDown={(e) => move(e)}
+      onKeyUp={(e) => restartInterval(e)}
+    >
       <StyledTetris>
         <Stage stage={stage} />
         <aside>
@@ -93,9 +127,9 @@ const Tetris = () => {
             <Display gameOver={gameOver} text="Game Over" />
           ) : (
             <>
-              <Display text="Score" />
-              <Display text="Row" />
-              <Display text="Level" />
+              <Display text={`Score : ${score}`} />
+              <Display text={`Rows : ${rows}`} />
+              <Display text={`Level : ${level}`} />
             </>
           )}
           <StartButton callback={startGame} />

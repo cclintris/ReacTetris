@@ -12,7 +12,7 @@ export const useStage = (player, resetPlayer) => {
     const sweepRows = (stage) =>
       stage.reduce((newStage, row) => {
         if (row.findIndex((cell) => cell[0] === 0) === -1) {
-          setRowsCleared((prev) => prev++)
+          setRowsCleared((prev) => prev + 1)
           newStage.unshift(new Array(STAGE_W).fill([0, 'clear']))
           return newStage
         }
@@ -38,7 +38,7 @@ export const useStage = (player, resetPlayer) => {
         })
       })
 
-      // Then check if collision occured
+      // Check if collision occured
       if (player.collided) {
         resetPlayer()
         return sweepRows(newStage)
