@@ -13,7 +13,7 @@ export const useStage = (player, resetPlayer) => {
       stage.reduce((newStage, row) => {
         if (row.findIndex((cell) => cell[0] === 0) === -1) {
           setRowsCleared((prev) => prev++)
-          newStage.unshift(new Array(STAGE_W).fill([0, 'clean']))
+          newStage.unshift(new Array(STAGE_W).fill([0, 'clear']))
           return newStage
         }
         newStage.push(row)
@@ -49,5 +49,5 @@ export const useStage = (player, resetPlayer) => {
     setStage((prev) => updateStage(prev))
   }, [player, resetPlayer])
 
-  return [stage, setStage]
+  return [stage, setStage, rowsCleared]
 }
