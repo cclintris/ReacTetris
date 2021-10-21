@@ -50,7 +50,7 @@ const Tetris = () => {
 
     const collided = detectCollision(player, stage, { x: 0, y: 1 })
 
-    console.log('drop collided', collided)
+    // console.log('drop collided', collided)
 
     if (!collided) {
       updatePlayerPos({

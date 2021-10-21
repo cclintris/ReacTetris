@@ -9,16 +9,22 @@ export const useStage = (player, resetPlayer) => {
   useEffect(() => {
     setRowsCleared(0)
 
-    const sweepRows = (stage) =>
-      stage.reduce((newStage, row) => {
+    // There is something strange about React performance using the previous coding
+    const sweepRows = (stage) => {
+      let rows = 0
+      const newStage = stage.reduce((newStage, row) => {
         if (row.findIndex((cell) => cell[0] === 0) === -1) {
-          setRowsCleared((prev) => prev + 1)
+          // setRowsCleared((prev) => prev + 1)
+          rows += 1
           newStage.unshift(new Array(STAGE_W).fill([0, 'clear']))
           return newStage
         }
         newStage.push(row)
         return newStage
       }, [])
+
+      return [newStage, rows]
+    }
 
     const updateStage = (prevStage) => {
       // First flush the current stage
@@ -41,7 +47,9 @@ export const useStage = (player, resetPlayer) => {
       // Check if collision occured
       if (player.collided) {
         resetPlayer()
-        return sweepRows(newStage)
+        const [res, rows] = sweepRows(newStage)
+        setRowsCleared(rows)
+        return res
       }
 
       return newStage
